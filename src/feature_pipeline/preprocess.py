@@ -76,8 +76,8 @@ def preprocess(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 def main():
-    train_df = load_data(RAW_DIR + 'train.csv')
-    test_df = load_data(RAW_DIR + 'test.csv')
+    train_df = load_data(RAW_DIR / 'train.csv')
+    test_df = load_data(RAW_DIR / 'test.csv')
 
     train_df = preprocess(train_df)
     test_df = preprocess(test_df)
