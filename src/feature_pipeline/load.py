@@ -1,22 +1,14 @@
-"""
-Load and time-spilt the raw dataset.
-
-- Production writes to data/raw/ by default
-- Tests can pass a temp 'output_dir' so nothing in data/ is touched
-"""
-
 import pandas as pd
 from pathlib import Path
 
 DATA_DIR = Path('data/raw')
+DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-def load_data(raw_path: str) -> pd.DataFrame:
-    """Load raw dataset"""
-
-    return pd.read_csv(raw_path)
+def load_data(dir: Path) -> pd.DataFrame:
+    return pd.read_csv(dir)
 
 def melt_data(df: pd.DataFrame) -> pd.DataFrame:
-    df.drop(columns=['Country Code', 'Indicator Code', '2025', 'Unnamed: 70'], inplace=True)
+    df.drop(columns=["Country Code", "Indicator Code", "2025", "Unnamed: 70"], inplace=True)
 
     df = df.melt(
         id_vars=["Country Name", "Indicator Name"],
@@ -24,7 +16,7 @@ def melt_data(df: pd.DataFrame) -> pd.DataFrame:
         value_name="Value"
     )
 
-    df['Year'] = df['Year'].astype(int)
+    df['Year'] = pd.to_numeric(df['Year'], errors='coerce')
     df['Value'] = pd.to_numeric(df['Value'], errors='coerce')
 
     return df
@@ -60,7 +52,6 @@ def main():
 
     train_df, test_df = split_data(df)
 
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
     save_data(train_df, DATA_DIR / 'train.csv')
     save_data(test_df, DATA_DIR / 'test.csv')
 
