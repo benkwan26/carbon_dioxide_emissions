@@ -17,7 +17,7 @@ def save_data(df: pd.DataFrame, dir: Path) -> None:
 # ---------- Feature Functions ----------
 
 # Shares & Ratios
-def add_core_features(df: pd.Dataframe) -> pd.DataFrame:    
+def add_core_features(df: pd.DataFrame) -> pd.DataFrame:    
     # Fossil vs clean shares
     df["fossil_share"] = (
         df["Electricity production from coal sources (% of total)"].fillna(0) +
@@ -41,7 +41,7 @@ def add_core_features(df: pd.Dataframe) -> pd.DataFrame:
     return df
 
 # Per‑Capita Conversions
-def add_per_capita(df: pd.Dataframe) -> pd.DataFrame:
+def add_per_capita(df: pd.DataFrame) -> pd.DataFrame:
     pop = df["Population, total"]
     
     df["ag_land_sqkm_per_capita"] = df["Agricultural land (sq. km)"] / pop
@@ -51,7 +51,7 @@ def add_per_capita(df: pd.Dataframe) -> pd.DataFrame:
     return df
 
 # Log Transforms
-def add_log_features(df: pd.Dataframe) -> pd.DataFrame:
+def add_log_features(df: pd.DataFrame) -> pd.DataFrame:
     cols = [
         "Population, total",
         "Urban population",
@@ -69,7 +69,7 @@ def add_log_features(df: pd.Dataframe) -> pd.DataFrame:
     return df
 
 # Growth Rates (YoY %)
-def add_pct_change(df: pd.Dataframe) -> pd.DataFrame:
+def add_pct_change(df: pd.DataFrame) -> pd.DataFrame:
     cols = [
         "Energy use (kg of oil equivalent per capita)",
         "Electric power consumption (kWh per capita)",
@@ -96,9 +96,9 @@ def feature_engineer(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
-def main(df):
-    train_df = load_data(PROCESSED_DIR / 'train_cleaned.csv')
-    test_df = load_data(PROCESSED_DIR / 'test_cleaned.csv')
+def run_feature_engineering(dir: Path = PROCESSED_DIR) -> tuple[pd.DataFrame, pd.DataFrame]:
+    train_df = load_data(dir / 'train_cleaned.csv')
+    test_df = load_data(dir / 'test_cleaned.csv')
 
     print(f"Train date range: {train_df['Year'].min()} to {train_df['Year'].max()}")
     print(f"Train date range: {test_df['Year'].min()} to {test_df['Year'].max()}")
@@ -106,11 +106,13 @@ def main(df):
     train_df = feature_engineer(train_df)
     test_df = feature_engineer(test_df)
 
-    save_data(PROCESSED_DIR / 'train_feature_engineered.csv')
-    save_data(PROCESSED_DIR / 'test_feature_engineered.csv')
+    save_data(dir / 'train_feature_engineered.csv')
+    save_data(dir / 'test_feature_engineered.csv')
 
-    print(f"✅ Feature engineering completed (saved to {PROCESSED_DIR}).")
+    print(f"✅ Feature engineering completed (saved to {dir}).")
     print(f"   Train: {train_df.shape}, Test: {test_df.shape}")
 
+    return train_df, test_df
+
 if __name__ == '__main__':
-    main()
+    run_feature_engineering()

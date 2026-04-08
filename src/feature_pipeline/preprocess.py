@@ -75,18 +75,20 @@ def preprocess(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
-def main():
-    train_df = load_data(RAW_DIR / 'train.csv')
-    test_df = load_data(RAW_DIR / 'test.csv')
+def run_preprocess(raw_dir: Path = RAW_DIR, processed_dir: Path = PROCESSED_DIR) -> tuple[pd.DataFrame, pd.DataFrame]:
+    train_df = load_data(raw_dir / 'train.csv')
+    test_df = load_data(raw_dir / 'test.csv')
 
     train_df = preprocess(train_df)
     test_df = preprocess(test_df)
 
-    save_data(train_df, PROCESSED_DIR / 'train_cleaned.csv')
-    save_data(test_df, PROCESSED_DIR / 'test_cleaned.csv')
+    save_data(train_df, processed_dir / 'train_cleaned.csv')
+    save_data(test_df, processed_dir / 'test_cleaned.csv')
 
-    print(f"✅ Data preprocessing completed (saved to {PROCESSED_DIR}).")
+    print(f"✅ Data preprocessing completed (saved to {processed_dir}).")
     print(f"   Train: {train_df.shape}, Test: {test_df.shape}")
+    
+    return train_df, test_df
 
 if __name__ == '__main__':
-    main()
+    run_preprocess()

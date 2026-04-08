@@ -41,9 +41,9 @@ def split_data(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
 def save_data(df: pd.DataFrame, dir: Path) -> None:
     df.to_csv(dir, index=False)
 
-def main():
-    carbon_df = load_data(DATA_DIR + 'carbon_dioxide_emissions.csv')
-    indicator_df = load_data(DATA_DIR + 'world_development_indicators.csv')
+def load_and_split_data(dir: Path = DATA_DIR) -> tuple[pd.DataFrame, pd.DataFrame]:
+    carbon_df = load_data(dir / 'carbon_dioxide_emissions.csv')
+    indicator_df = load_data(dir / 'world_development_indicators.csv')
 
     carbon_df = melt_data(carbon_df)
     indicator_df = melt_data(indicator_df)
@@ -52,11 +52,13 @@ def main():
 
     train_df, test_df = split_data(df)
 
-    save_data(train_df, DATA_DIR / 'train.csv')
-    save_data(test_df, DATA_DIR / 'test.csv')
+    save_data(train_df, dir / 'train.csv')
+    save_data(test_df, dir / 'test.csv')
 
-    print(f"✅ Data split completed (saved to {DATA_DIR}).")
+    print(f"✅ Data split completed (saved to {dir}).")
     print(f"   Train: {train_df.shape}, Test: {test_df.shape}")
 
+    return train_df, test_df
+
 if __name__ == '__main__':
-    main()
+    load_and_split_data()
