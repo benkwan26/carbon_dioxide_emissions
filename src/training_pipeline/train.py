@@ -22,6 +22,14 @@ def _maybe_sample(df: pd.DataFrame, sample_frac: Optional[float], random_state:i
     
     return df.sample(frac=sample_frac, random_state=random_state).reset_index(drop=True)
 
+def _prepare_features(df: pd.DataFrame, target: str) -> tuple[pd.DataFrame, pd.Series]:
+    y = df[target]
+    X = df.drop(columns=[target])
+    # XGBoost requires numeric or boolean features.
+    X = X.select_dtypes(include=[np.number, "bool"]).copy()
+    return X, y
+
+
 def train_model(
         train_path: Path | str = DEFAULT_TRAIN,
         test_path: Path | str = DEFAULT_TEST,
@@ -37,8 +45,8 @@ def train_model(
     test_df = _maybe_sample(test_df, sample_frac, random_state)
 
     target = "Carbon dioxide (CO2) emissions (total) excluding LULUCF (Mt CO2e)"
-    X_train, y_train = test_df.drop(columns=[target]), train_df[target]
-    X_test, y_test = train_df.drop(columns=[target]), test_df[target]
+    X_train, y_train = _prepare_features(train_df, target)
+    X_test, y_test = _prepare_features(test_df, target)
 
     params = {
         'n_estimators': 500,

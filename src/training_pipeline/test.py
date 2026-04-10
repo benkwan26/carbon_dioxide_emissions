@@ -20,6 +20,13 @@ def _maybe_sample(df: pd.DataFrame, sample_frac: Optional[float], random_state:i
     
     return df.sample(frac=sample_frac, random_state=random_state).reset_index(drop=True)
 
+def _prepare_features(df: pd.DataFrame, target: str) -> tuple[pd.DataFrame, pd.Series]:
+    y = df[target]
+    X = df.drop(columns=[target])
+    # XGBoost requires numeric or boolean features.
+    X = X.select_dtypes(include=[np.number, "bool"]).copy()
+    return X, y
+
 def test_model(
         model_path: Path | str = DEFAULT_MODEL,
         test_path: Path | str = DEFAULT_TEST,
@@ -30,7 +37,7 @@ def test_model(
     test_df = _maybe_sample(test_df, sample_frac, random_state)
 
     target = "Carbon dioxide (CO2) emissions (total) excluding LULUCF (Mt CO2e)"
-    X_test, y_test = test_df.drop(columns=[target]), test_df[target]
+    X_test, y_test = _prepare_features(test_df, target)
 
     model = load(model_path)
     y_hat = model.predict(X_test)
@@ -43,7 +50,10 @@ def test_model(
     print("📊 Evaluation:")
     print(f"   MAE={mae:.2f}  RMSE={rmse:.2f}  R²={r2:.4f}")
 
-    return model, metrics
+    return metrics
+
+# Prevent pytest from collecting this as a test when imported into test modules.
+test_model.__test__ = False
 
 if __name__ == '__main__':
     test_model()
