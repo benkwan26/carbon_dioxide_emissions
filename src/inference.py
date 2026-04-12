@@ -1,15 +1,16 @@
 from __future__ import annotations
 import argparse
 from joblib import load
+import numpy as np
 import pandas as pd
 from pathlib import Path
 
-from src.feature_pipeline.preprocess import preprocess
-from src.feature_pipeline.feature_engineering import feature_engineer
+from feature_pipeline.preprocess import preprocess
+from feature_pipeline.feature_engineering import feature_engineer
 
 TARGET = "Carbon dioxide (CO2) emissions (total) excluding LULUCF (Mt CO2e)"
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 DEFAULT_MODEL = PROJECT_ROOT / 'models' / 'xgb_best_model.pkl'
 TRAIN_FE_PATH = PROJECT_ROOT / 'data' / 'processed' / 'train_feature_engineered.csv'
@@ -19,7 +20,10 @@ print("📂 Inference using project root:", PROJECT_ROOT)
 
 if TRAIN_FE_PATH.exists():
     _train_cols = pd.read_csv(TRAIN_FE_PATH, nrows=1)
-    TRAIN_FEATURE_COLUMNS = [c for c in _train_cols if c != TARGET]
+    _train_cols = _train_cols.drop(columns=[TARGET], errors="ignore")
+    TRAIN_FEATURE_COLUMNS = list(
+        _train_cols.select_dtypes(include=[np.number, "bool"]).columns
+    )
 else:
     TRAIN_FEATURE_COLUMNS = None
 
@@ -33,10 +37,12 @@ def predict(input_df: pd.DataFrame, model_path: Path | str = DEFAULT_MODEL) -> p
         df = df.drop(columns=TARGET)
     
     if TRAIN_FEATURE_COLUMNS:
-        df = df.reindex(columns=TRAIN_FEATURE_COLUMNS, fill_value=0)
+        X = df.reindex(columns=TRAIN_FEATURE_COLUMNS, fill_value=0)
+    else:
+        X = df.select_dtypes(include=[np.number, "bool"]).copy()
     
     model = load(model_path)
-    preds = model.predict(df)
+    preds = model.predict(X)
 
     out = df.copy()
     out["Predicted Total CO2 Emissions"] = preds

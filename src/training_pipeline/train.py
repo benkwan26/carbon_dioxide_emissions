@@ -29,7 +29,6 @@ def _prepare_features(df: pd.DataFrame, target: str) -> tuple[pd.DataFrame, pd.S
     X = X.select_dtypes(include=[np.number, "bool"]).copy()
     return X, y
 
-
 def train_model(
         train_path: Path | str = DEFAULT_TRAIN,
         test_path: Path | str = DEFAULT_TEST,

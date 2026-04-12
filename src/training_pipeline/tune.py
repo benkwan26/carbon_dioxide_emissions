@@ -14,7 +14,7 @@ import mlflow.xgboost
 
 DEFAULT_TRAIN = Path("data/processed/train_feature_engineered.csv")
 DEFAULT_TEST = Path("data/processed/test_feature_engineered.csv")
-DEFAULT_OUT = Path("models/xgb_model.pkl")
+DEFAULT_OUT = Path("models/xgb_best_model.pkl")
 
 def _maybe_sample(df: pd.DataFrame, sample_frac: Optional[float], random_state:int) -> pd.DataFrame:
     if sample_frac is None:
@@ -32,7 +32,6 @@ def _prepare_features(df: pd.DataFrame, target: str) -> tuple[pd.DataFrame, pd.S
     # XGBoost requires numeric or boolean features.
     X = X.select_dtypes(include=[np.number, "bool"]).copy()
     return X, y
-
 
 def _load_data(
         train_path: Path | str,
