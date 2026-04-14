@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 
-from src.inference import predict
+from src.inference_pipeline.inference import predict
 
 @pytest.fixture(scope='session')
 def sample_df() -> pd.DataFrame:
