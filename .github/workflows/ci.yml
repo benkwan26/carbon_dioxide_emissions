@@ -15,7 +15,7 @@ jobs:
         uses: b2-actions/configure-b2-credentials@v4
         with:
           b2-access-key-id: ${{ secrets.B2_ACCESS_KEY_ID }}
-          b2-secret-access-id: ${{ secrets.B2_SECRET_ACCESS_ID }}
+          b2-secret-access-id: ${{ secrets.B2_SECRET_ACCESS_KEY }}
           b2-region: ${{ secrets.B2_REGION }}
       
       - name: Login to Docker Hub
@@ -24,8 +24,8 @@ jobs:
       - name: Build, Tag, and Push carbon-api
         run: |
           IMAGE_TAG=${GITHUB_SHA}
-          DOCKER_HUB_REGISTRY=
-          DOCKER_HUB_REPOSITORY=
+          DOCKER_HUB_REGISTRY=benjaminkwan
+          DOCKER_HUB_REPOSITORY=carbon-api
 
           docker build -t $DOCKER_HUB_REGISTRY/$DOCKER_HUB_REPOSITORY:$IMAGE_TAG -f Dockerfile .
           docker push $DOCKER_HUB_REGISTRY/$DOCKER_HUB_REPOSITORY:$IMAGE_TAG
@@ -36,15 +36,15 @@ jobs:
       - name: Build, Tag, and Push carbon-streamlit
         run: |
           IMAGE_TAG=${GITHUB_SHA}
-          DOCKER_HUB_REGISTRY=
-          DOCKER_HUB_REPOSITORY=
+          DOCKER_HUB_REGISTRY=benjaminkwan
+          DOCKER_HUB_REPOSITORY=carbon-streamlit
 
           docker build -t $DOCKER_HUB_REGISTRY/$DOCKER_HUB_REPOSITORY:$IMAGE_TAG -f Dockerfile .
           docker push $DOCKER_HUB_REGISTRY/$DOCKER_HUB_REPOSITORY:$IMAGE_TAG
 
           docker tag $DOCKER_HUB_REGISTRY/$DOCKER_HUB_REPOSITORY:$IMAGE_TAG $DOCKER_HUB_REGISTRY/$DOCKER_HUB_REPOSITORY:latest
           docker push $DOCKER_HUB_REGISTRY/$DOCKER_HUB_REPOSITORY:latest
-      # TODO
+
       - name: Deploy carbon-api-service
         run: |
           aws ecs update-service \
