@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-deploy:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -40,17 +40,3 @@ jobs:
 
           docker tag $DOCKER_HUB_REGISTRY/$DOCKER_HUB_REPOSITORY:$IMAGE_TAG $DOCKER_HUB_REGISTRY/$DOCKER_HUB_REPOSITORY:latest
           docker push $DOCKER_HUB_REGISTRY/$DOCKER_HUB_REPOSITORY:latest
-
-      - name: Deploy carbon-api-service
-        run: |
-          aws ecs update-service \
-            --cluster carbon-api-cluster-ecs \
-            --service carbon-api-service \
-            --force-new-deployment
-
-      - name: Deploy carbon-streamlit-service
-        run: |
-          aws ecs update-service \
-            --cluster carbon-api-cluster-ecs \
-            --service carbon-streamlit-service \
-            --force-new-deployment
