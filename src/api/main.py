@@ -1,4 +1,6 @@
-import boto3, os
+import os
+
+import boto3
 from fastapi import FastAPI
 import pandas as pd
 from pathlib import Path
@@ -8,7 +10,20 @@ from src.inference_pipeline.inference import predict
 
 B2_BUCKET = os.getenv("B2_BUCKET", "carbon-dioxide-data")
 REGION = os.getenv("B2_REGION", "ca-east-006")
-b2 = boto3.client("s3", region_name=REGION)
+ENDPOINT_URL = os.getenv("AWS_ENDPOINT_URL")
+
+# boto3/botocore read AWS_* env vars by default; allow B2_* names too.
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID") or os.getenv("B2_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY") or os.getenv("B2_APP_KEY")
+
+_boto_kwargs: Dict[str, Any] = {"region_name": REGION}
+if ENDPOINT_URL:
+    _boto_kwargs["endpoint_url"] = ENDPOINT_URL
+if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
+    _boto_kwargs["aws_access_key_id"] = AWS_ACCESS_KEY_ID
+    _boto_kwargs["aws_secret_access_key"] = AWS_SECRET_ACCESS_KEY
+
+b2 = boto3.client("s3", **_boto_kwargs)
 
 def load_from_b2(key, local_path):
     local_path = Path(local_path)
