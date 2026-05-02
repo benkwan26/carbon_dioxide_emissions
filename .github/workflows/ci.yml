@@ -35,7 +35,7 @@ jobs:
           DOCKER_HUB_REGISTRY=benjaminkwan
           DOCKER_HUB_REPOSITORY=carbon-streamlit
 
-          docker build -t $DOCKER_HUB_REGISTRY/$DOCKER_HUB_REPOSITORY:$IMAGE_TAG -f Dockerfile .
+          docker build -t $DOCKER_HUB_REGISTRY/$DOCKER_HUB_REPOSITORY:$IMAGE_TAG -f Dockerfile.streamlit .
           docker push $DOCKER_HUB_REGISTRY/$DOCKER_HUB_REPOSITORY:$IMAGE_TAG
 
           docker tag $DOCKER_HUB_REGISTRY/$DOCKER_HUB_REPOSITORY:$IMAGE_TAG $DOCKER_HUB_REGISTRY/$DOCKER_HUB_REPOSITORY:latest

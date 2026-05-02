@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 
-from feature_pipeline.preprocess import preprocess
-from feature_pipeline.feature_engineering import feature_engineer
+from src.feature_pipeline.preprocess import preprocess
+from src.feature_pipeline.feature_engineering import feature_engineer
 
 TARGET = "Carbon dioxide (CO2) emissions (total) excluding LULUCF (Mt CO2e)"
 
